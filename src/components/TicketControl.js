@@ -2,6 +2,8 @@ import React from "react";
 import NewTicketForm from './NewTicketForm';
 import TicketList from './TicketList';
 import TicketDetail from './TicketDetail';
+import EditTicketForm from './EditTicketForm';
+import { v4 } from 'uuid';
 
 class TicketControl extends React.Component {
 
@@ -9,8 +11,28 @@ class TicketControl extends React.Component {
     super(props);
     this.state = {
       formVisibleOnPage: false,
-      mainTicketList: [],
-      selectedTicket: null
+      mainTicketList: [
+        {
+          id: v4(),
+          names: 'Thato and Haley',
+          location: '3A',
+          issue: 'Firebase won\'t save record. Halp.'
+        },
+        {
+          id: v4(),
+          names: 'Sleater and Kinney',
+          location: '4B',
+          issue: 'Prop types are throwing an error.'
+        },
+        {
+          id: v4(),
+          names: 'Imani & Jacob',
+          location: '9F',
+          issue: 'Child component isn\'t rendering.'
+        }
+      ],
+      selectedTicket: null,
+      editing: false
     };
   }
 
@@ -40,12 +62,30 @@ class TicketControl extends React.Component {
     this.setState({selectedTicket: selectedTicket});
   }
 
+  handleDeletingTicket = (id) => {
+    const newMainTicketList = this.state.mainTicketList.filter(ticket => ticket.id !== id);
+    this.setState({
+      mainTicketList: newMainTicketList,
+      selectedTicket: null
+    });
+  }
+
+  handleEditClick = () => {
+    console.log("handleEditClick reached!");
+    this.setState({editing: true});
+  }
+
   render(){
     let currentlyVisibleState = null;
     let buttonText = null; 
 
-    if (this.state.selectedTicket != null) {
-      currentlyVisibleState = <TicketDetail ticket = {this.state.selectedTicket} />
+    if (this.state.editing) {
+      currentlyVisibleState = <EditTicketForm ticket = {this.state.selectedTicket} onEditTicket = { this.handleEditingTicketInList } />
+      buttonText = "Return to Ticket List";
+    }
+
+     else if (this.state.selectedTicket != null) {
+      currentlyVisibleState = <TicketDetail ticket = {this.state.selectedTicket} onClickingDelete = {this.handleDeletingTicket} onClickingEdit = {this.handleEditClick} />
       buttonText = "Return to Ticket List";
       // While our TicketDetail component only takes placeholder data, we will eventually be passing the value of selectedTicket as a prop.
     }
